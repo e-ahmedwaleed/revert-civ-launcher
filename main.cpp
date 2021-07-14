@@ -7,6 +7,8 @@ using namespace std;
 
 void revertLauncherLocation(string &dir, string &file_name);
 
+int modified = 0;
+
 int main() {
     DIR *dir;
     string dir_name = R"(C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests)";
@@ -18,11 +20,12 @@ int main() {
                 revertLauncherLocation(dir_name, file_name);
         }
         closedir(dir);
+        printf("%d file(s) modified.\n", modified);
     } else {
         /* could not open directory */
         perror("Error, please report back to the programmer");
-        return system("pause");
     }
+    return system("pause");
 }
 
 string loadFile(string &file_path);
@@ -39,8 +42,10 @@ void revertLauncherLocation(string &dir, string &file_name) {
         file_contents = regex_replace(file_contents, regex(R"(2KLauncher\/LauncherPatcher.exe)"),
                                       "LaunchPad/LaunchPad.exe");
 
-    if (file_contents.size() != size)
+    if (file_contents.size() != size) {
+        modified++;
         reWriteFile(file_path, file_contents);
+    }
 }
 
 void reWriteFile(string &file_path, string &file_contents) {
